@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="Description" content="Type Test">
+    <title>Type Test</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="timer">
+        <p>Time:<span id="Time">0s</span></p>
+    </div>
+    <div class="paragraph">
+        <p>Skill Safari is a skill enhancement and training company that set out to nurture the skills of young students and Re-Skill professionals in web development and design.</p>
+    </div>
+    <textarea rows="5" id="text-input" placeholder="Click Start Time and Type here when the timer starts"></textarea>
+    <button id="start-time">Start Test</button>
+    <button id="stop-time">Stop Test</button>
+    <div class="result">
+        <h2>Result</h2>
+        <div class="result-wrapper">
+            <p>Words per minute:<span id="wpm"></span></p>
+            <p>Mistakes: <span id="mistakes"></span></p>
+            <p>No of Matching Characters: <span id="matching-characters"></span></p>
+            <p>No of Matching Words: <span id="matching-words"></span></p>
+            <p>Result Percentage:<span id="result-percentage"></span></p>
+        </div>
+    </div>
+</div>    
+
+<script>
+  let container = document.querySelector(".container");
+  let paragraph = document.querySelector(".paragraph");
+  let userInput = document.querySelector("#text-input");
+  let startTime = document.querySelector("#start-time");
+  let stopTime = document.querySelector("#stop-time");
+  let result = document.querySelector(".result");
+  let resultWrapper = document.querySelector(".result-wrapper");
+  let time = 60;
+  let timer ="";
+  let mistakes = 0;
+  let matchingWords = 0;
+
+ 
+ //timer on screen
+ function updateTimer(){
+    if(time == 0){
+        //display the result
+        displayResult();
+
+    }else{
+        document.getElementById("Time").innerText = --time + "s";
+    }
+ }
+ 
+  //Set timer
+ const timerReduce =() =>{
+    time = 60;
+    timer = setInterval(updateTimer,1000);
+ }
+
+ //display result
+ const displayResult = ()=>{
+    result.style.display = "block";
+    clearInterval(timer);
+    stopTime.style.display = "none";
+    userInput.disabled = true;
+    let takenTime = 1;
+    if(time != 0){
+        takenTime = (60-time)/100;
+    }
+
+    const typedWords = userInput.value.trim().split(" ");
+    const originalWords = paragraph.textContent.trim().split(" ");
+
+    let highlightedParagraph = "";
+    let mistakes = 0;
+    let matchingWords = 0;
+    let matchingCharacters = 0;
+
+    for (let i = 0; i < originalWords.length; i++) {
+        if (typedWords[i] === originalWords[i]) {
+            highlightedParagraph += `<span class="correct">${originalWords[i]}</span> `;
+            matchingWords++;
+            matchingCharacters += originalWords[i].length;
+        } else {
+            highlightedParagraph += `<span class="mistake">${originalWords[i]}</span> `;
+            mistakes++;
+        }
+    }
+
+    paragraph.innerHTML = highlightedParagraph;
+    document.getElementById("wpm").innerText = (typedWords.length / takenTime).toFixed(2) + " wpm";
+    document.getElementById("mistakes").innerText = mistakes;
+    document.getElementById("matching-characters").innerText = matchingCharacters;
+    document.getElementById("matching-words").innerText = matchingWords;
+    document.getElementById("result-percentage").innerText = ((matchingWords / originalWords.length) * 100).toFixed(2) + "%";
+    container.classList.add("expanded");
+ };
+//start test
+const startTest = () =>{
+    timer="";
+    userInput.disabled = false;
+    userInput.value = "";
+    container.classList.remove("expanded");
+    timerReduce();
+    startTime.style.display = "none";
+    stopTime.style.display = "block";
+    mistakes = 0;
+    matchingWords = 0;
+    result.style.display = "none";
+};
+
+window.onload = ()=>{
+    userInput.value = "";
+    startTime.addEventListener("click",startTest);
+    stopTime.style.display = "none";
+    userInput.disabled = true;
+};
+//stop the test
+stopTime.addEventListener("click",(e)=>{
+    e.preventDefault();
+    userInput.disabled = true;
+    displayResult();
+    startTime.style.display = "block";
+})
+
+
+
+
+</script>
+</body>
+</html>
